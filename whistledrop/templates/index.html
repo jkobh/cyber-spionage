@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhistleDrop - Whistleblower Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to WhistleDrop</h1>
+        <p>Your secure platform for anonymous whistleblowing.</p>
+    </header>
+    <main>
+        <section>
+            <h2>About WhistleDrop</h2>
+            <p>WhistleDrop allows whistleblowers to securely upload sensitive information while maintaining anonymity. The uploaded files are encrypted and can only be accessed by authorized journalists.</p>
+        </section>
+        <section>
+            <h2>How It Works</h2>
+            <ol>
+                <li>Whistleblower uploads a file through the secure platform.</li>
+                <li>The file is encrypted and stored securely.</li>
+                <li>Journalists can retrieve and decrypt the files using their private keys.</li>
+            </ol>
+        </section>
+        <section>
+            <h2>Get Started</h2>
+            <a href="{{ url_for('upload') }}">Upload a File</a>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 WhistleDrop. All rights reserved.</p>
+    </footer>
+</body>
+</html>

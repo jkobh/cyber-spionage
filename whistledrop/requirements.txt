@@ -1,0 +1,8 @@
+Flask==2.2.2
+PyCryptodome==3.14.1
+requests==2.26.0
+stem==1.8.0
+SQLAlchemy==1.4.27
+Flask-SQLAlchemy==2.5.1
+Flask-WTF==1.0.0
+WTForms==3.0.0

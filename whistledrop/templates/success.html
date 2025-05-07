@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Successful</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Successful</h1>
+        <p>Your file has been successfully uploaded and encrypted.</p>
+        <p>Thank you for contributing to WhistleDrop.</p>
+        <a href="{{ url_for('index') }}">Return to Home</a>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+<!-- TODO: Design the success page -->

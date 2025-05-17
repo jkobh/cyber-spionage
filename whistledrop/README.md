@@ -64,46 +64,17 @@ dieses Projekt an.
 
 ## Projektstruktur
 
-Die Projektstruktur ist wie folgt:
-
-```
-whistledrop
-├── server
-│   ├── __init__.py
-│   ├── app.py
-│   ├── config.py
-│   ├── models.py
-│   ├── routes.py
-│   ├── crypto.py
-│   ├── tor_service.py
-│   └── utils.py
-├── journalist
-│   ├── __init__.py
-│   ├── client.py
-│   ├── crypto.py
-│   └── key_manager.py
-├── templates
-│   ├── index.html
-│   ├── upload.html
-│   └── success.html
-├── static
-│   ├── css
-│   │   └── style.css
-│   └── js
-│       └── main.js
-├── tests
-│   ├── __init__.py
-│   ├── test_crypto.py
-│   └── test_app.py
-├── .gitignore
-├── README.md
-├── requirements.txt
-└── setup.py
-```
-
 ## Installation
 
 Um WhistleDrop lokal auszuführen, folgen Sie diesen Schritten:
+
+- Tor Browser installieren
+
+torrc
+Fügen Sie folgende Zeilen hinzu:
+ControlPort 9051
+CookieAuthentication 1
+
 
 1. Klonen Sie das Repository:
    ```
@@ -116,39 +87,40 @@ Um WhistleDrop lokal auszuführen, folgen Sie diesen Schritten:
    pip install -r requirements.txt
    ```
 
-3. Starten Sie den Server:
+3. Datenbank initialisieren
+   ```
+   python manage.py init
+   ```
+
+4. Testschlüssel generieren
+   ```
+   python manage.py generate --count 10
+   ```
+
+5. Schlüsselstatus überprüfen
+   ```
+   python manage.py status
+   ```
+
+6. Server starten
    ```
    python -m server.app
    ```
 
-## Nutzung
+7. Seite Aufrufen
+   ```
+   http://127.0.0.1:5000
+   ```
 
-- Whistleblower können Dateien über die Upload-Seite hochladen.
-- Journalisten können die hochgeladenen Dateien abrufen und entschlüsseln.
+### Journalist-Client
 
-## Sicherheit
+#### Zeigen Sie alle verfügbaren Dateien an
+python -m journalist.client list --server http://127.0.0.1:5000
 
-WhistleDrop verwendet AES für die symmetrische Verschlüsselung der hochgeladenen Dateien und RSA für das Schlüsselmanagement. Alle sensiblen Daten werden sicher gespeichert und nur verschlüsselt auf der Festplatte abgelegt.
+#### Datei abrufen und entschlüsseln
+python -m journalist.client retrieve --server http://127.0.0.1:5000 --file-id 1 --output entschluesselt.pdf --key-file privater_schluessel.pem
 
-## TODOs
 
-- Implementierung der Serverinitialisierung und Routen in `server/app.py`.
-- Definition der Konfigurationsvariablen in `server/config.py`.
-- Implementierung der Datenmodelle in `server/models.py`.
-- Implementierung der Routenhandler in `server/routes.py`.
-- Implementierung der kryptographischen Funktionen in `server/crypto.py`.
-- Implementierung des Tor-Dienstmanagements in `server/tor_service.py`.
-- Implementierung von Hilfsfunktionen in `server/utils.py`.
-- Implementierung der Client-Logik in `journalist/client.py`.
-- Implementierung der RSA-Funktionen in `journalist/crypto.py`.
-- Implementierung der Schlüsselmanagementfunktionen in `journalist/key_manager.py`.
-- Gestaltung der HTML-Vorlagen in `templates/`.
-- Definition der CSS-Stile in `static/css/style.css`.
-- Implementierung der clientseitigen Skripte in `static/js/main.js`.
-- Schreiben von Tests für die kryptographischen Funktionen in `tests/test_crypto.py`.
-- Schreiben von Tests für die Anwendungslogik in `tests/test_app.py`.
-- Definition der Paketmetadaten und Abhängigkeiten in `setup.py`.
 
-## Lizenz
-
-Dieses Projekt ist unter der MIT-Lizenz lizenziert. Weitere Informationen finden Sie in der LICENSE-Datei.
+#### Checks the server status
+python -m journalist.client status --server http://127.0.0.1:5000

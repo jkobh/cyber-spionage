@@ -7,15 +7,53 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header>
+        <h1>WhistleDrop</h1>
+        <p>Secure Whistleblower Platform</p>
+    </header>
+    
     <div class="container">
-        <h1>Upload File</h1>
-        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-            <label for="file">Select file to upload:</label>
-            <input type="file" name="file" id="file" required>
-            <button type="submit">Upload</button>
+        <h2>Upload File</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="alert alert-warning">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <form action="{{ url_for('main.upload_file') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file">Select a file to upload:</label>
+                <input type="file" id="file" name="file" required>
+                <small>Allowed file types: PDF, TXT, DOCX, XLSX, PNG, JPG</small>
+            </div>
+            
+            <div class="security-note">
+                <h3>Security Information</h3>
+                <ul>
+                    <li>Your file will be encrypted immediately upon upload</li>
+                    <li>Only authorized journalists with the proper decryption keys can access your data</li>
+                    <li>No identifying information is stored with your upload</li>
+                    <li>For maximum anonymity, use the Tor Browser and clear your browser cache after uploading</li>
+                </ul>
+            </div>
+            
+            <button type="submit" class="button">Upload File</button>
         </form>
-        <p>All uploads are anonymous and securely encrypted.</p>
+        
+        <div class="back-link">
+            <a href="{{ url_for('main.index') }}">Back to Home</a>
+        </div>
     </div>
+    
+    <footer>
+        <p>WhistleDrop operates as a Tor Hidden Service to ensure your anonymity.</p>
+    </footer>
+    
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

@@ -158,7 +158,7 @@ def decrypt_file(encrypted_data_json, aes_key):
     Decrypt a file using an AES key.
     
     Args:
-        encrypted_data_json: JSON string containing IV and ciphertext
+        encrypted_data_json: JSON string or dict containing IV and ciphertext
         aes_key: The AES key (bytes)
         
     Returns:
@@ -168,13 +168,22 @@ def decrypt_file(encrypted_data_json, aes_key):
     from Crypto.Util.Padding import unpad
     
     try:
-        # Parse the encrypted data
+        # Try to parse as JSON if it's a string
         if isinstance(encrypted_data_json, str):
-            encrypted_data = json.loads(encrypted_data_json)
+            try:
+                encrypted_data = json.loads(encrypted_data_json)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse encrypted_data as JSON: {e}")
+                logger.error(f"Data preview: {encrypted_data_json[:50]}...")
+                return None
         else:
             encrypted_data = encrypted_data_json
             
         # Extract IV and ciphertext
+        if 'iv' not in encrypted_data or 'ciphertext' not in encrypted_data:
+            logger.error(f"Missing required fields in encrypted_data: {encrypted_data.keys()}")
+            return None
+            
         iv = base64.b64decode(encrypted_data['iv'])
         ciphertext = base64.b64decode(encrypted_data['ciphertext'])
         
@@ -188,6 +197,8 @@ def decrypt_file(encrypted_data_json, aes_key):
         return data
     except Exception as e:
         logger.error(f"Error decrypting file: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def format_keypair_for_json(private_key, public_key, key_id):

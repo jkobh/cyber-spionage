@@ -56,21 +56,30 @@ def upload_file():
             flash('No available keys for encryption')
             return redirect(request.url)
         
-        # Generate a random AES key for file encryption
-        aes_key = generate_aes_key()
+        # Read the file content first
+        file_contents = file.read()
         
-        # Read and encrypt the file
-        file_data = file.read()
-        encrypted_data = encrypt_file(file_data, aes_key)
+        # Generate a random AES key for file encryption
+        # Encrypt the file
+        aes_key = generate_aes_key()
+        encrypted_data = encrypt_file(file_contents, aes_key)
+        
+        # Ensure encrypted_data is a proper JSON string, then encode to bytes
+        if isinstance(encrypted_data, bytes):
+            # If it's already bytes, decode it to string first so we can ensure consistent format
+            encrypted_data = encrypted_data.decode('utf-8')
+        
+        # Convert to bytes before storing in the database
+        encrypted_data_bytes = encrypted_data.encode('utf-8')
         
         # Encrypt the AES key with the RSA public key
         encrypted_aes_key = encrypt_aes_key(aes_key, unused_key.public_key)
         
-        # Save the encrypted file and key to the database
+        # Save to database - with encrypted_data as bytes
         new_file = UploadedFile(
             filename=file.filename,
-            encrypted_data=encrypted_data.encode('utf-8') if isinstance(encrypted_data, str) else encrypted_data,
-            aes_key=encrypted_aes_key if isinstance(encrypted_aes_key, bytes) else encrypted_aes_key.encode('utf-8'),
+            encrypted_data=encrypted_data_bytes,  # Now this is bytes
+            aes_key=encrypted_aes_key,            # This should already be bytes
             key_id=unused_key.id,
             created_at=datetime.now()
         )
@@ -94,29 +103,36 @@ def upload_file():
 
 @main.route('/retrieve/<int:file_id>', methods=['GET'])
 def retrieve_file(file_id):
-    """
-    API endpoint for journalists to retrieve encrypted files.
-    This should only be accessed through the journalist client.
-    """
-    # Basic authentication could be added here if needed
-    # For better security, consider implementing API tokens
-    
+    """API endpoint for journalists to retrieve encrypted files."""
     try:
+        # Get the file from the database
         file = UploadedFile.query.get_or_404(file_id)
         
-        # Get the corresponding RSA key
+        # Get the corresponding key
         key = RSAKey.query.get_or_404(file.key_id)
         
-        # Return the encrypted file data and metadata
-        return jsonify({
+        # Prepare the response
+        response_data = {
             'id': file.id,
             'filename': file.filename,
-            'encrypted_data': base64.b64encode(file.encrypted_data).decode('utf-8') if isinstance(file.encrypted_data, bytes) else file.encrypted_data,
-            'encrypted_aes_key': base64.b64encode(file.aes_key).decode('utf-8') if isinstance(file.aes_key, bytes) else file.aes_key,
             'key_id': file.key_id,
             'created_at': file.created_at.isoformat() if file.created_at else None
-        })
-    
+        }
+        
+        # Handle encrypted_data based on its type
+        if isinstance(file.encrypted_data, bytes):
+            response_data['encrypted_data'] = file.encrypted_data.decode('utf-8')
+        else:
+            response_data['encrypted_data'] = file.encrypted_data
+            
+        # Handle aes_key based on its type
+        if isinstance(file.aes_key, bytes):
+            response_data['encrypted_aes_key'] = base64.b64encode(file.aes_key).decode('utf-8')
+        else:
+            response_data['encrypted_aes_key'] = file.aes_key
+            
+        return jsonify(response_data)
+        
     except Exception as e:
         logger.error(f"Error retrieving file {file_id}: {e}")
         return jsonify({'error': 'File not found or error retrieving file'}), 404

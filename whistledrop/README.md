@@ -96,6 +96,10 @@ CookieAuthentication 1
    ```
    python manage.py generate --count 10
    ```
+   oder
+   ```
+   python .\create_keypairs.py
+   ```
 
 5. Schlüsselstatus überprüfen
    ```
@@ -118,8 +122,7 @@ CookieAuthentication 1
 python -m journalist.client list --server http://127.0.0.1:5000
 
 #### Datei abrufen und entschlüsseln
-python -m journalist.client retrieve --server http://127.0.0.1:5000 --file-id 1 --output entschluesselt.pdf --key-file privater_schluessel.pem
-
+python -m journalist.client retrieve --server http://127.0.0.1:5000 --keys keys.json --file-id 1 --output test.txt
 
 
 #### Checks the server status

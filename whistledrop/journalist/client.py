@@ -62,16 +62,7 @@ class JournalistClient:
             return False
     
     def retrieve_file(self, file_id, output_path):
-        """
-        Retrieve and decrypt a file from the server.
-        
-        Args:
-            file_id: The ID of the file to retrieve
-            output_path: Where to save the decrypted file
-        
-        Returns:
-            bool: Whether the operation was successful
-        """
+        """Retrieve and decrypt a file from the server."""
         if not self.keys:
             logger.error("No keys loaded. Cannot decrypt files.")
             return False
@@ -84,30 +75,31 @@ class JournalistClient:
                 return False
                 
             file_data = response.json()
+            logger.info(f"Retrieved file: {file_data['filename']}")
             
             # Find the right key for decryption
-            key_id = file_data.get('key_id')
-            if str(key_id) not in self.keys:
+            key_id = str(file_data.get('key_id'))
+            if key_id not in self.keys:
                 logger.error(f"No matching private key found for key_id {key_id}")
                 return False
                 
-            private_key = self.keys[str(key_id)]
+            private_key = self.keys[key_id]
             
-            # Korrekte Dekodierung des verschlüsselten AES-Schlüssels
-            encrypted_aes_key = file_data['encrypted_aes_key']
-            # Wenn es ein String ist, Base64-Decodierung anwenden
-            if isinstance(encrypted_aes_key, str):
-                encrypted_aes_key = base64.b64decode(encrypted_aes_key)
+            # Decrypt the AES key using the private RSA key
+            encrypted_aes_key = base64.b64decode(file_data['encrypted_aes_key'])
             aes_key = decrypt_with_rsa(encrypted_aes_key, private_key)
             
-            # Decrypt the file data using the AES key
-            encrypted_data = json.loads(file_data['encrypted_data'])
-            iv = base64.b64decode(encrypted_data['iv'])
-            ciphertext = base64.b64decode(encrypted_data['ciphertext'])
+            # Debug the encrypted_data format
+            logger.info(f"Encrypted data type: {type(file_data['encrypted_data'])}")
+            logger.info(f"Encrypted data preview: {str(file_data['encrypted_data'])[:50]}...")
             
-            cipher = AES.new(aes_key, AES.MODE_CBC, iv)
-            padded_data = cipher.decrypt(ciphertext)
-            data = unpad(padded_data, AES.block_size)
+            # Use the decrypt_file function directly from journalist.crypto
+            from journalist.crypto import decrypt_file
+            data = decrypt_file(file_data['encrypted_data'], aes_key)
+            
+            if not data:
+                logger.error("Failed to decrypt the file")
+                return False
             
             # Save the decrypted file
             with open(output_path, 'wb') as f:
@@ -118,6 +110,8 @@ class JournalistClient:
             
         except Exception as e:
             logger.error(f"Error retrieving and decrypting file: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def check_server_status(self):

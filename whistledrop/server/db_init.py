@@ -75,7 +75,7 @@ def check_keys_available(app):
             logger.warning("No available RSA keys! Uploads will fail until keys are added.")
             
         return available_keys
-        
+
 def generate_test_keys(app, count=5):
     """Generate test RSA keys for development/testing purposes."""
     from Crypto.PublicKey import RSA

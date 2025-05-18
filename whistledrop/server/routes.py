@@ -208,36 +208,6 @@ def status():
             'message': str(e)
         }), 500
 
-@main.route('/admin/add_key', methods=['POST'])
-def add_key():
-    """
-    Administrative endpoint to add a new RSA public key.
-    This should be properly secured in a production environment.
-    """
-    # In a real implementation, this should be protected with strong authentication
-    if 'key' not in request.form:
-        return jsonify({'error': 'No key provided'}), 400
-    
-    try:
-        public_key = request.form['key']
-        
-        # Check if the key already exists
-        existing_key = RSAKey.query.filter_by(public_key=public_key).first()
-        if existing_key:
-            return jsonify({'error': 'Key already exists'}), 400
-        
-        # Add the new key
-        new_key = RSAKey(public_key=public_key, is_used=False)
-        db.session.add(new_key)
-        db.session.commit()
-        
-        return jsonify({'message': 'Key added successfully', 'id': new_key.id})
-    
-    except Exception as e:
-        logger.error(f"Error adding key: {e}")
-        db.session.rollback()
-        return jsonify({'error': f'Error adding key: {str(e)}'}), 500
-
 @main.route('/success')
 def success():
     """Display success message after file upload."""

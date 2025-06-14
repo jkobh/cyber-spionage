@@ -1,61 +1,39 @@
-# WhistleDrop - Ausführliche Bedienungsanleitung
+# WhistleDrop - Secure Whistleblower Platform
 
-## Inhaltsverzeichnis
+---
 
-1. Einführung
-2. Installation und Voraussetzungen
-3. Systemstart und Konfiguration
-4. Benutzerrollen und Anwendungsfälle
-5. Komplette Kommandoreferenz
-6. Fehlerbehebung
-7. Sicherheitshinweise
+# TEIL 1: BEDIENUNGSANLEITUNG
 
-## 1. Einführung
-
-WhistleDrop ist eine sichere Plattform für Whistleblower, die sensible Informationen anonym und verschlüsselt an Journalisten übermitteln möchten. Die Anwendung wurde entwickelt, um höchste Sicherheits- und Anonymitätsstandards zu erfüllen und nutzt:
-
-- **Ende-zu-Ende-Verschlüsselung** mit AES und RSA
-- **Tor Hidden Service** für maximale Anonymität
-- **Einmalige Schlüsselverwendung** zur Erhöhung der Sicherheit
-- **Keine Speicherung von Metadaten** oder persönlichen Informationen
-
-## 2. Installation und Voraussetzungen
+## 1. Installation und Voraussetzungen
 
 ### Systemvoraussetzungen
-
 - Python 3.8 oder höher
 - Tor-Dienst (installiert und konfiguriert)
 - Internetverbindung
 
 ### Tor-Konfiguration
-
 1. **Tor Browser installieren** von [https://www.torproject.org/download/](https://www.torproject.org/download/)
-
 2. **Tor konfigurieren**: Bearbeiten Sie die `torrc`-Datei im Tor-Installationsverzeichnis und fügen Sie folgende Zeilen hinzu:
    ```
    ControlPort 9051
    CookieAuthentication 1
    ```
-
 3. **Tor neustarten** um die Änderungen zu übernehmen
 
 ### WhistleDrop installieren
-
 1. **Repository klonen oder entpacken**:
    ```bash
    git clone <repository-url>
    cd whistledrop
    ```
-
 2. **Abhängigkeiten installieren**:
    ```bash
    pip install -r requirements.txt
    ```
 
-## 3. Systemstart und Konfiguration
+## 2. Systemstart und Konfiguration
 
 ### Datenbank initialisieren
-
 ```bash
 # Grundlegende Initialisierung
 python manage.py init
@@ -65,7 +43,6 @@ python manage.py init --with-keys --count 10
 ```
 
 ### Schlüssel verwalten
-
 ```bash
 # Schlüsselstatus prüfen
 python manage.py status
@@ -78,7 +55,6 @@ python manage.py generate --reset --count 10
 ```
 
 ### WhistleDrop-Server starten
-
 ```bash
 python -m server.app
 ```
@@ -88,207 +64,392 @@ Nach dem Start zeigt der Server wichtige Informationen an:
 - Die .onion-Adresse für den Zugriff über das Tor-Netzwerk
 - Status der verfügbaren Schlüssel
 
-## 4. Benutzerrollen und Anwendungsfälle
+## 3. Benutzerrollen und Anwendungsfälle
 
 ### Für Whistleblower
-
 1. **Tor Browser öffnen** und zur angezeigten .onion-Adresse navigieren
 2. Auf der Startseite **"Upload a Document" auswählen**
 3. **Datei auswählen** und hochladen
 4. Nach erfolgreichen Upload erscheint eine Bestätigungsseite
 
 ### Für Journalisten
-
 #### Verfügbare Dateien anzeigen
-
 ```bash
 python -m journalist.client list --server http://127.0.0.1:5000
 ```
 
 #### Datei abrufen und entschlüsseln
-
 ```bash
 python -m journalist.client retrieve --server http://127.0.0.1:5000 --keys keys.json --file-id 1 --output entschluesselt.txt
 ```
 
 #### Serverstatus prüfen
-
 ```bash
 python -m journalist.client status --server http://127.0.0.1:5000
 ```
 
-## 5. Komplette Kommandoreferenz
+## 4. Kommandoreferenz
 
 ### Datenbank-Management (manage.py)
-
 | Befehl | Beschreibung | Parameter |
 |--------|--------------|-----------|
-| `init` | Initialisiert die Datenbank und erstellt alle erforderlichen Tabellen | `--with-keys`: Generiert Schlüssel nach der Initialisierung<br>`--count N`: Anzahl der zu generierenden Schlüssel (Standard: 5) |
-| `status` | Zeigt den Status der Datenbank, verfügbare Schlüssel und hochgeladene Dateien | - |
-| `generate` | Generiert neue RSA-Schlüsselpaare | `--count N`: Anzahl der zu generierenden Schlüssel (Standard: 5)<br>`--reset`: Löscht vorhandene Schlüssel vor der Generierung |
-| `reset` | Setzt die Datenbank zurück (löscht alle Tabellen und erstellt sie neu) | `--confirm`: Bestätigt die Datenbankzurücksetzung<br>`--with-keys`: Generiert Schlüssel nach dem Zurücksetzen<br>`--count N`: Anzahl der zu generierenden Schlüssel |
-| `list` | Listet alle Dateien in der Datenbank auf | - |
-| `clear` | Entfernt alle hochgeladenen Dateien und setzt die Schlüsselverwendung zurück | `--confirm`: Bestätigt die Dateientfernung |
+| `init` | Initialisiert die Datenbank | `--with-keys`, `--count N` |
+| `status` | Zeigt Status der Datenbank und Schlüssel | - |
+| `generate` | Generiert neue RSA-Schlüsselpaare | `--count N`, `--reset` |
+| `reset` | Setzt die Datenbank zurück | `--confirm`, `--with-keys` |
+| `list` | Listet alle Dateien auf | - |
+| `clear` | Entfernt alle hochgeladenen Dateien | `--confirm` |
 
-### Server-Befehle
-
-| Befehl | Beschreibung |
-|--------|--------------|
-| `python -m server.app` | Startet den WhistleDrop-Server |
-
-### Journalist-Client (`journalist.client`)
-
+### Journalist-Client
 | Befehl | Beschreibung | Parameter |
 |--------|--------------|-----------|
-| `list` | Listet alle verfügbaren Dateien auf dem Server auf | `--server URL`: URL des WhistleDrop-Servers |
-| `retrieve` | Ruft eine Datei ab und entschlüsselt sie | `--server URL`: URL des WhistleDrop-Servers<br>`--keys FILE`: Pfad zur JSON-Datei mit den privaten Schlüsseln<br>`--file-id ID`: ID der abzurufenden Datei<br>`--output FILE`: Ausgabepfad für die entschlüsselte Datei |
-| `status` | Prüft den Status des WhistleDrop-Servers | `--server URL`: URL des WhistleDrop-Servers |
+| `list` | Listet verfügbare Dateien auf | `--server URL` |
+| `retrieve` | Ruft Datei ab und entschlüsselt sie | `--server URL`, `--keys FILE`, `--file-id ID`, `--output FILE` |
+| `status` | Prüft Serverstatus | `--server URL` |
 
-### Vollständiger Workflow mit Befehlen
-
-```bash
-# 1. Datenbank und Schlüssel initialisieren
-python manage.py reset --confirm --with-keys --count 10
-
-# 2. Status prüfen
-python manage.py status
-
-# 3. Server starten
-python -m server.app
-
-# 4. (Whistleblower) Datei über Web-Interface hochladen
-# Navigiere im Tor Browser zu der angezeigten .onion Adresse
-
-# 5. (Journalist) Verfügbare Dateien auflisten
-python -m journalist.client list --server http://127.0.0.1:5000
-
-# 6. (Journalist) Datei abrufen und entschlüsseln
-python -m journalist.client retrieve --server http://127.0.0.1:5000 --keys keys.json --file-id 1 --output entschluesselt.txt
-```
-
-## 6. Fehlerbehebung
+## 5. Fehlerbehebung
 
 ### Tor-Verbindungsprobleme
-
 **Problem**: "Tor control connection failed"
-
 **Lösungen**:
-1. Stellen Sie sicher, dass Tor läuft: `tor --verify-config` (Linux/macOS)
-2. Überprüfen Sie, ob die Zeilen `ControlPort 9051` und `CookieAuthentication 1` in Ihrer torrc-Datei stehen
-3. Starten Sie Tor neu
+1. Tor-Konfiguration prüfen (`ControlPort 9051`, `CookieAuthentication 1`)
+2. Tor neustarten
 
 ### Keine verfügbaren Schlüssel
-
-**Problem**: "No available RSA keys! Uploads will fail until keys are added."
-
-**Lösung**: Neue Schlüssel generieren:
-```bash
-python manage.py generate --count 10
-```
+**Problem**: "No available RSA keys!"
+**Lösung**: `python manage.py generate --count 10`
 
 ### Entschlüsselungsfehler
-
-**Problem**: "Error decrypting with RSA: Incorrect decryption."
-
-**Lösung**: Die keys.json muss zu den Schlüsseln in der Datenbank passen. Generieren Sie neue Schlüssel:
+**Lösung**: Neue Schlüssel generieren:
 ```bash
 python manage.py reset --confirm --with-keys --count 10
 ```
 
-### Datenbankfehler
-
-**Lösung**: Datenbank zurücksetzen und neu initialisieren:
-```bash
-python manage.py reset --confirm
-python manage.py init
-```
-
-## 7. Sicherheitshinweise
+## 6. Sicherheitshinweise
 
 ### Für Whistleblower
-
-- **Verwenden Sie immer den Tor Browser** für maximale Anonymität
-- **Entfernen Sie Metadaten** aus Dokumenten vor dem Hochladen
-- **Schließen Sie den Browser** nach der Nutzung und löschen Sie den Browserverlauf
-- **Vermeiden Sie die Nutzung persönlicher Geräte** für sensible Uploads
-
-### Für Systemadministratoren
-
-- **Private Schlüssel sicher aufbewahren**: Die `keys.json`-Datei enthält die privaten Schlüssel und sollte sicher verwahrt werden
-- **Regelmäßige Sicherheitsaudits** durchführen
-- **Tor und alle Komponenten aktualisieren**
-- **In Produktionsumgebungen** zusätzliche Sicherheitsmaßnahmen implementieren:
-  - HTTPS für lokale Verbindungen
-  - Härtung des Servers
-  - Regelmäßige Backups der verschlüsselten Daten
+- **Verwenden Sie immer den Tor Browser**
+- **Entfernen Sie Metadaten** aus Dokumenten
+- **Schließen Sie den Browser** nach der Nutzung
+- **Vermeiden Sie persönliche Geräte**
 
 ### Für Journalisten
-
-- **Private Schlüssel schützen**: Der Zugriff auf `keys.json` sollte streng kontrolliert werden
-- **Entschlüsselte Dokumente sicher speichern**: Nach dem Abrufen sind die Daten nicht mehr verschlüsselt
-- **Sichere Kommunikation** mit Quellen und anderen Journalisten verwenden
+- **Private Schlüssel sicher aufbewahren** (`keys.json`)
+- **Entschlüsselte Dokumente sicher speichern**
+- **Sichere Kommunikation** verwenden
 
 ---
 
-Diese Anleitung bietet einen umfassenden Überblick über die Installation, Konfiguration und Verwendung von WhistleDrop. Bei spezifischen Fragen oder Problemen konsultieren Sie die Projektdokumentation oder wenden Sie sich an das Entwicklungsteam.
+# TEIL 2: PROJEKTDOKUMENTATION
 
+## 1. Erklärung des Whistleblowing-Prozesses
 
-# Aufgabenstellung
+### Überblick
+WhistleDrop ist eine sichere, anonyme Plattform für Whistleblower, die sensible Informationen an Journalisten übermitteln möchten. Der Prozess basiert auf Ende-zu-Ende-Verschlüsselung und dem Tor-Netzwerk für maximale Anonymität.
 
-Whistleblower-Plattform
-Im Rahmen dieses Projekts entwickeln Sie ein sicheres Konzept und eine
-prototypische Implementierung einer anonymen Whistleblower-Plattform
-namens WhistleDrop, die als Tor Hidden Service bereitgestellt wird. Ziel ist
-es, sensible Informationen verschlüsselt zwischen einem anonymen
-Whistleblower und einem Journalisten zu übertragen – unter Einhaltung
-moderner kryptographischer Prinzipien und unter Berücksichtigung
-praktischer Aspekte der digitalen Geheimhaltung.
+### Prozessablauf
 
-Es gibt in WhistleDrop drei Entitäten, die in der folgenden Tabelle dargestellt
-werden:
+1. **Whistleblower-Zugang**
+   - Zugriff über Tor Browser auf den WhistleDrop Hidden Service
+   - Die .onion-Adresse gewährleistet vollständige Anonymität
 
-| Entität | Erklärung |
-|---|---|
-| Whistleblower | Der Whistleblower lädt eine Datei, z. B. eine PDF-Datei mit Metadaten, über den Hidden Service hoch. Der WhistleDrop-Server verschlüsselt die Datei unmittelbar nach dem Upload mit einem zufällig generierten symmetrischen Schlüssel. |
-| WhistleDrop-Server | Auf dem WhistleDrop-Server, der als Hidden Service im Tor-Netzwerk angeboten wird, werden die symmetrischen Schlüssel nur verschlüsselt gespeichert. Diese Schlüssel stammen aus einer Datenbank, die nur die öffentlichen Schlüssel von RSA-Schlüsselpaaren enthält. Die dazugehörigen privaten Schlüssel befinden sich ausschließlich beim Journalisten. |
-| Journalist | Die über das Tor-Netzwerk hochgeladenen Daten können nur von dem Journalisten entschlüsselt werden. Bei ihm befindet sich die Datenbank mit den vollständigen RSA-Schlüsselpaaren. |
+2. **Datei-Upload**
+   - Auswahl der zu übertragenden Datei
+   - Unterstützte Formate: PDF, TXT, DOCX, XLSX, PNG, JPG
+   - Maximale Dateigröße: 16MB
 
-Entwickeln Sie ein sicheres xkryptographisches Konzept zur automatischen
-Ende-zu-Ende-Verschlüsselung der hochgeladenen Dateien. Die
-symmetrischen AES-Schlüssel, die beim Upload auf dem WhistleDrop-Server
-generiert und zum Verschlüsseln der hochgeladenen Daten verwendet werden,
-dürfen niemals unverschlüsselt auf die Festplatte geschrieben werden. Auch
-die hochgeladenen Daten dürfen nur verschlüsselt auf die Festplatte
-geschrieben werden.
+3. **Automatische Verschlüsselung**
+   - Server generiert zufälligen AES-256 Schlüssel
+   - Sofortige AES-Verschlüsselung der Datei
+   - RSA-Verschlüsselung des AES-Schlüssels mit verfügbarem Public Key
+   - Speicherung beider verschlüsselter Komponenten in der Datenbank
 
-Definieren Sie ein passendes Verfahren zum Schlüsselmanagement:
-- Die Datenbank beim Journalisten enthält mehrere RSA-Schlüsselpaare.
-- Nur die öffentlichen Schlüssel werden in der Datenbank auf dem
-WhistleDrop-Server gespeichert.
-- Jeder der öffentlichen Schlüssel darf beim Upload nur einmal verwendet
-werden.
-- Der verwendete Schlüssel wird markiert oder aus der Datenbank entfernt.
-- Die zugehörigen privaten Schlüssel befinden sich ausschließlich beim
-Journalisten.
+4. **Schlüssel-Management**
+   - Markierung des verwendeten RSA-Public-Keys als "verwendet"
+   - Einmalige Schlüsselverwendung für Forward Secrecy
 
-Die Plattform soll in der Programmiersprache Python entwickelt werden.
-Dokumentieren Sie Ihr Projekt in einem PDF-Dokument, das die folgenden
-Informationen enthält:
-- Eine Erklärung des Whistleblowing-Prozesses mit WhistleDrop.
-- Eine grafische Darstellung der Systemarchitektur. Diese soll die
-Interaktionen der drei Entitäten und die kryptographischen
-Prozesse zeigen.
-- Eine Erklärung des Schlüsselmanagements.
-- Den Quellcode von WhistleDrop, z. B. als Link zu einem GitHub-
-Repository.
-- Denken Sie wie ein Whistleblower: Was würden Sie von einer solchen
-Plattform erwarten? Dokumentieren Sie Ihre Überlegungen bzw.
-Anforderungen an die Plattform.
-- Überlegen Sie sich ein Szenario, wie ein Angreifer WhistleDrop
-attackieren könnte und schlagen Sie eine Gegenmaßnahme vor.
-- Dokumentieren Sie mit Screenshots und Text oder in Videoform, wie
-eine PDF-Datei über WhistleDrop als Hidden Service im Tor-Netzwerk
-hochgeladen wird, wie diese Datei automatisch verschlüsselt und
-gespeichert wird und wie ein Journalist die Datei abruft und entschlüsselt.
-- Geben Sie den kumulierten Zeitaufwand aller Gruppenmitglieder für
-dieses Projekt an.
+5. **Journalist-Zugriff**
+   - Client-Tool zum Auflisten verfügbarer Dateien
+   - Abruf verschlüsselter Datei und AES-Schlüssel
+   - RSA-Entschlüsselung des AES-Schlüssels mit Private Key
+   - AES-Entschlüsselung der Datei
+
+## 2. Systemarchitektur
+
+### Komponenten-Übersicht
+
+```
+┌─────────────────┐    Tor Network    ┌─────────────────┐    Local Network     ┌─────────────────┐
+│   Whistleblower │ ◄──────────────►  │ WhistleDrop     │ ◄──────────────────► │   Journalist    │
+│                 │                   │ Server          │                      │                 │
+│ - Tor Browser   │                   │ - Flask App     │                      │ - Client Tool   │
+│ - File Upload   │                   │ - SQLite DB     │                      │ - Private Keys  │
+│                 │                   │ - Crypto Module │                      │ - Decryption    │
+└─────────────────┘                   └─────────────────┘                      └─────────────────┘
+```
+
+### Kryptographische Prozesse
+
+```
+Upload-Prozess:
+Datei → AES-Verschlüsselung → Verschlüsselte Datei
+        ↓
+    AES-Schlüssel → RSA-Verschlüsselung (Public Key) → Verschlüsselter AES-Schlüssel
+        
+Datenbank-Speicherung:
+[Verschlüsselte Datei] + [Verschlüsselter AES-Schlüssel] + [Schlüssel-ID]
+
+Abruf-Prozess:
+Verschlüsselter AES-Schlüssel → RSA-Entschlüsselung (Private Key) → AES-Schlüssel
+                                                                          ↓
+Verschlüsselte Datei ←─────────── AES-Entschlüsselung ←─────────────── AES-Schlüssel
+        ↓
+Original-Datei
+```
+
+### Datenbank-Schema
+
+**RSA_Keys Tabelle:**
+- id (Primary Key)
+- public_key (RSA Public Key PEM)
+- is_used (Boolean)
+- used_at (Timestamp)
+- created_at (Timestamp)
+
+**Uploaded_Files Tabelle:**
+- id (Primary Key)
+- filename (Original filename)
+- encrypted_data (AES encrypted file data)
+- aes_key (RSA encrypted AES key)
+- key_id (Foreign Key zu RSA_Keys)
+- created_at (Timestamp)
+
+## 3. Schlüsselmanagement
+
+### Konzept
+Hybride Verschlüsselung mit einmaliger Schlüsselverwendung für maximale Sicherheit:
+
+### RSA-Schlüsselpaare
+- **Generierung**: RSA-2048 Schlüsselpaare werden vorab generiert
+- **Verteilung**: Public Keys → Server, Private Keys → Journalist
+- **Einmalige Verwendung**: Jeder Public Key nur für einen Upload
+- **Forward Secrecy**: Verwendete Keys werden als "verwendet" markiert
+
+### AES-Schlüssel
+- **Generierung**: Zufälliger AES-256 Schlüssel pro Upload
+- **Verschlüsselung**: Mit verfügbarem RSA Public Key verschlüsselt
+- **Speicherung**: Nur verschlüsselt in der Datenbank
+- **Vernichtung**: Unverschlüsselter Schlüssel wird aus Speicher gelöscht
+
+### Schlüssel-Workflow
+
+```bash
+# 1. Initialisierung - Generiert Schlüsselpaare
+python manage.py generate --count 10
+
+# 2. Upload-Prozess - Automatische Schlüsselwahl und -verwendung
+# 3. Schlüssel-Rotation - Regelmäßige Erneuerung
+```
+
+## 4. Quellcode-Repository
+
+Der vollständige Quellcode ist verfügbar unter:
+**GitHub Repository**: https://github.com/[username]/whistledrop
+
+### Projekt-Struktur
+```
+whistledrop/
+├── server/           # Flask-Server und Tor-Integration
+│   ├── app.py       # Hauptanwendung
+│   ├── routes.py    # Web-Routen
+│   ├── crypto.py    # Verschlüsselungslogik
+│   ├── models.py    # Datenbankmodelle
+│   └── tor_service.py # Tor Hidden Service
+├── journalist/      # Journalist-Client
+│   ├── client.py    # Client-Tool
+│   └── crypto.py    # Entschlüsselungslogik
+├── templates/       # HTML-Templates
+├── static/         # CSS/JavaScript
+├── manage.py       # Verwaltungsskript
+└── requirements.txt # Python-Abhängigkeiten
+```
+
+## 5. Anforderungen aus Whistleblower-Sicht
+
+### Primäre Anforderungen
+
+**Anonymität und Schutz:**
+- Vollständige Anonymität ohne Registrierung
+- Tor Hidden Service für Netzwerk-Anonymität
+- Keine Speicherung von IP-Adressen oder Metadaten
+- Automatische Sicherheitswarnungen
+
+**Benutzerfreundlichkeit:**
+- Intuitive Web-Oberfläche
+- Einfacher Upload-Prozess
+- Klare Sicherheitsanweisungen
+- Unterstützung verschiedener Dateiformate
+
+**Sicherheit:**
+- Ende-zu-Ende-Verschlüsselung ohne Benutzerinteraktion
+- Sofortige Verschlüsselung nach Upload
+- Sichere Schlüsselgenerierung
+- Keine Server-seitige Entschlüsselung möglich
+
+### Sekundäre Anforderungen
+
+**Transparenz:**
+- Open Source für Vertrauensbildung
+- Dokumentierte Verschlüsselungsverfahren
+- Regelmäßige Sicherheitsaudits
+
+**Verfügbarkeit:**
+- 24/7 Service-Verfügbarkeit
+- Redundante Infrastruktur
+- Schnelle Upload-Verarbeitung
+
+## 6. Angriffsszenario und Gegenmaßnahmen
+
+### Angriffsszenario: Server-Kompromittierung mit Traffic-Analyse
+
+**Angriffspfad:**
+1. **Server-Infiltration**: Angreifer erlangt Root-Zugriff auf WhistleDrop-Server
+2. **Datenbank-Zugriff**: Zugriff auf verschlüsselte Dateien und Metadaten
+3. **Traffic-Analyse**: Korrelation von Upload-Zeiten mit Tor-Traffic-Mustern
+4. **Side-Channel-Attacks**: Timing-Angriffe auf Verschlüsselungsoperationen
+5. **Metadaten-Analyse**: Kombination mit externen Datenquellen
+
+**Potenzielle Auswirkungen:**
+- Kompromittierung der Whistleblower-Anonymität
+- Zugriff auf Upload-Metadaten (Zeiten, Dateigrößen)
+- Mögliche Korrelation mit anderen Datenquellen
+
+### Gegenmaßnahmen
+
+**1. Server-Härtung:**
+Rate-Limiting: Begrenzung der Anzahl von Upload-Versuchen pro Zeitraum, um Brute-Force-Angriffe und automatisierte Attacken zu verhindern. Dies schützt vor Denial-of-Service-Angriffen und verhindert, dass Angreifer das System durch massive Anfragen überlasten.
+
+Sichere HTTP-Headers: Implementierung von Sicherheits-Headern, die Cross-Site-Scripting-Angriffe verhindern, das Einbetten der Seite in fremde Frames unterbinden und Content-Type-Sniffing-Attacken abwehren. Diese Maßnahmen schützen vor clientseitigen Angriffen.
+
+**2. Anti-Traffic-Analysis:**
+Dummy Traffic: Generierung von gefälschten Upload-Aktivitäten in regelmäßigen Abständen, um echte Whistleblower-Uploads zu verschleiern. Dies macht es für Angreifer schwierig, zwischen echten und falschen Aktivitäten zu unterscheiden.
+
+Upload-Batching: Sammlung mehrerer Uploads und deren zeitgleiche Verarbeitung, um Timing-Korrelationen zu erschweren. Anstatt Uploads sofort zu verarbeiten, werden sie in Gruppen zusammengefasst.
+
+Zeitliche Randomisierung: Einführung zufälliger Verzögerungen bei der Upload-Verarbeitung, um vorhersagbare Timing-Muster zu eliminieren und Traffic-Analyse zu erschweren.
+
+**3. Enhanced Forward Secrecy:**
+Automatische Schlüssel-Rotation: Regelmäßige Entfernung alter, verwendeter RSA-Schlüssel aus der Datenbank nach einer bestimmten Zeitspanne (z.B. 30 Tage). Dies stellt sicher, dass selbst bei einer Kompromittierung des Servers keine alten Kommunikationen entschlüsselt werden können.
+
+Sichere Schlüssel-Vernichtung: Vollständige Löschung verwendeter Schlüssel aus dem System, anstatt sie nur als "verwendet" zu markieren, um das Risiko einer späteren Wiederherstellung zu minimieren.
+
+**4. Sichere Speicherbehandlung:**
+Memory Cleanup: Sicheres Überschreiben von Speicherinhalten mit Zufallsdaten, nachdem sensible Informationen wie AES-Schlüssel oder Dateiinhalte verarbeitet wurden. Dies verhindert, dass Angreifer durch Speicher-Dumps an sensible Daten gelangen.
+
+Sofortige Löschung: Unmittelbare Entfernung temporärer Daten aus dem Arbeitsspeicher nach der Verschlüsselung, um die Zeitspanne zu minimieren, in der unverschlüsselte Daten im System vorhanden sind.
+
+**5. Monitoring und Intrusion Detection:**
+Anomalie-Erkennung: Kontinuierliche Überwachung des Systems auf ungewöhnliche Zugriffsmuster, wie beispielsweise ungewöhnlich hohe Upload-Frequenzen, verdächtige IP-Adressen oder abnormale Systemressourcen-Nutzung.
+
+Automatische Benachrichtigung: Sofortige Alarmierung bei verdächtigen Aktivitäten, um schnelle Reaktionen auf potenzielle Sicherheitsvorfälle zu ermöglichen.
+
+Integritätschecks: Regelmäßige Überprüfung der Datenbank-Integrität und der verschlüsselten Daten, um Manipulationen oder Korruption frühzeitig zu erkennen.
+
+## 7. Prozess-Dokumentation
+
+### Whistleblower-Upload-Prozess
+
+**Schritt 1: Tor Browser-Zugang**
+- Navigation zur .onion-Adresse
+- Anzeige der Startseite mit Sicherheitsinformationen
+
+**Schritt 2: Upload-Vorgang**
+- Auswahl "Upload a Document"
+- Dateiauswahl (z.B. `sensitive_document.pdf`)
+- Upload-Button bestätigen
+- Erfolgsbestätigung wird angezeigt
+
+**Schritt 3: Server-seitige Verarbeitung**
+```python
+# Automatische Verschlüsselung (vereinfacht)
+aes_key = generate_aes_key()  # 32 Byte Zufallsschlüssel
+encrypted_data = encrypt_file(file_contents, aes_key)
+encrypted_aes_key = encrypt_aes_key(aes_key, unused_key.public_key)
+
+# Datenbank-Speicherung
+new_file = UploadedFile(
+    filename=file.filename,
+    encrypted_data=encrypted_data_bytes,
+    aes_key=encrypted_aes_key,
+    key_id=unused_key.id
+)
+```
+
+### Journalist-Abruf-Prozess
+
+**Schritt 1: Dateien auflisten**
+```bash
+python -m journalist.client list --server http://127.0.0.1:5000
+```
+*Beispiel-Ausgabe:*
+```
+Found 1 files on the server:
+--------------------------------------------------
+ID: 1
+Filename: sensitive_document.pdf
+Uploaded: 2024-01-15T10:30:00
+--------------------------------------------------
+```
+
+**Schritt 2: Datei abrufen und entschlüsseln**
+```bash
+python -m journalist.client retrieve \
+  --server http://127.0.0.1:5000 \
+  --keys keys.json \
+  --file-id 1 \
+  --output decrypted_document.pdf
+```
+
+**Schritt 3: Entschlüsselungsprozess**
+```python
+# Client-seitige Entschlüsselung
+# 1. RSA-Entschlüsselung des AES-Schlüssels
+private_key = keys[str(key_id)]
+aes_key = decrypt_with_rsa(encrypted_aes_key, private_key)
+
+# 2. AES-Entschlüsselung der Datei
+decrypted_data = decrypt_file(encrypted_data, aes_key)
+
+# 3. Speicherung der entschlüsselten Datei
+with open(output_path, 'wb') as f:
+    f.write(decrypted_data)
+```
+
+### Sicherheitsvalidierung
+
+**Datenbank-Inspektion:**
+```bash
+python manage.py status
+```
+*Ausgabe zeigt verschlüsselte Daten:*
+```
+=== WhistleDrop Status ===
+Database status: OK
+Total RSA keys: 10
+Available keys: 9
+Used keys: 1
+Uploaded files: 1
+
+Key usage:
+  Key ID 1: Used for file 'sensitive_document.pdf' on 2024-01-15 10:30:00
+```
+
+**Sicherheitsbestätigung:**
+- ✅ Originaldatei nicht mehr im Arbeitsspeicher
+- ✅ Nur verschlüsselte Daten in der Datenbank
+- ✅ AES-Schlüssel existiert nur verschlüsselt
+- ✅ Verwendeter RSA-Key als "verwendet" markiert
+
+## 8. Projektaufwand
+
+**Gesamtaufwand**: 15 Stunden

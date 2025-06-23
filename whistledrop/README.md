@@ -179,13 +179,13 @@ WhistleDrop ist eine sichere, anonyme Plattform für Whistleblower, die sensible
 ### Komponenten-Übersicht
 
 ```
-┌─────────────────┐    Tor Network    ┌─────────────────┐    Local Network     ┌─────────────────┐
-│   Whistleblower │ ◄──────────────►  │ WhistleDrop     │ ◄──────────────────► │   Journalist    │
-│                 │                   │ Server          │                      │                 │
-│ - Tor Browser   │                   │ - Flask App     │                      │ - Client Tool   │
-│ - File Upload   │                   │ - SQLite DB     │                      │ - Private Keys  │
-│                 │                   │ - Crypto Module │                      │ - Decryption    │
-└─────────────────┘                   └─────────────────┘                      └─────────────────┘
+┌─────────────────┐  Tor      ┌─────────────────┐   Local  ┌─────────────────┐
+│   Whistleblower │ ◄──────►  │ WhistleDrop     │ ◄──────► │   Journalist    │
+│                 │  Network  │ Server          │  Network │                 │
+│ - Tor Browser   │           │ - Flask App     │          │ - Client Tool   │
+│ - File Upload   │           │ - SQLite DB     │          │ - Private Keys  │
+│                 │           │ - Crypto Module │          │ - Decryption    │
+└─────────────────┘           └─────────────────┘          └─────────────────┘
 ```
 
 ### Kryptographische Prozesse

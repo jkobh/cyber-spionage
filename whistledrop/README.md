@@ -452,7 +452,7 @@ Key usage:
 
 ## 7 Doku Video
 
-**Videolink:** https://youtu.be/AnLI3UIbTIg
+**Videolink:** 
 
 ## 8. Projektaufwand
 

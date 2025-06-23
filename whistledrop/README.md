@@ -450,6 +450,10 @@ Key usage:
 - ✅ AES-Schlüssel existiert nur verschlüsselt
 - ✅ Verwendeter RSA-Key als "verwendet" markiert
 
+## 7 Doku Video
+
+**Videolink:** https://youtu.be/AnLI3UIbTIg
+
 ## 8. Projektaufwand
 
 **Gesamtaufwand**: 15 Stunden
